@@ -1,10 +1,8 @@
-import {Timestamp} from "firebase-admin/firestore";
-
 export interface TAToken {
   token: string;
   sign: string;
-  generationTime: Timestamp;
-  expirationTime: Timestamp;
+  generationTime: Date;
+  expirationTime: Date;
   source: string;
   destination: string;
 }

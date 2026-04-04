@@ -34,7 +34,6 @@ const CreateVoucherSchema = z.object({
 );
 
 export async function createVoucher(data: unknown): Promise<ApiResponse> {
-  console.log(data);
   const result = CreateVoucherSchema.safeParse(data);
 
   if (!result.success) {
@@ -47,14 +46,15 @@ export async function createVoucher(data: unknown): Promise<ApiResponse> {
     };
   }
 
-  const {accessToken, encryptedCert, encryptedKey, billState} = result.data;
+  const {encryptedCert, encryptedKey, billState} = result.data;
+  const access_token="umVjlF97JY359d7B7zVh69zGb8JDs4yX5AYbCJtClRQviupmKIEwWTUWZBrGmq6k";
   const credentials = {
-    accessToken,
+    accessToken: access_token,
     encryptedCert,
     encryptedKey,
-    CUIT: "20393425920",
+    CUIT: "20407713606",
   };
-  const puntoVenta = 2;
+  const puntoVenta = 1;
 
   try {
     let tipoFactura = 11;

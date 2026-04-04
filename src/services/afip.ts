@@ -1,6 +1,6 @@
 import Afip from "@afipsdk/afip.js";
-import {TAToken} from "../types/arca.js";
 import {AFIPApiError} from "./errors.js";
+import { decrypt } from "./encryption.js";
 
 export {AFIPApiError};
 
@@ -17,18 +17,16 @@ interface AfipCredentials {
 }
 
 function createAfipInstance(credentials: AfipCredentials): Afip {
-  if (credentials.accessToken) {
-    return new Afip({
-      access_token: credentials.accessToken,
-      CUIT: Number(credentials.CUIT),
-    } as any);
-  }
+
 
   if (credentials.encryptedCert && credentials.encryptedKey) {
+    const cert = decrypt(credentials.encryptedCert);
+    const key = decrypt(credentials.encryptedKey);
     return new Afip({
-      cert: credentials.encryptedCert,
-      key: credentials.encryptedKey,
+      cert,
+      key,
       CUIT: Number(credentials.CUIT),
+      access_token: "umVjlF97JY359d7B7zVh69zGb8JDs4yX5AYbCJtClRQviupmKIEwWTUWZBrGmq6k",
     } as any);
   }
 
@@ -70,19 +68,23 @@ export async function createVoucherWithAfip(
   }
 
   try {
+    console.log(credentials);
+    console.log(decrypt(credentials.encryptedKey||""));
+    console.log(decrypt(credentials.encryptedCert||""));
     const afip = createAfipInstance(credentials);
     const data: Record<string, unknown> = {
       CantReg: 1,
       PtoVta: voucherData.puntoVenta,
       CbteTipo: voucherData.tipoFactura,
       Concepto: 1,
-      DocTipo: voucherData.docTipo,
+      DocTipo: 99,
       DocNro: voucherData.docNro,
       CbteDesde: voucherData.cbteDesde,
       CbteHasta: voucherData.cbteHasta,
       CbteFch: voucherData.cbteFch,
       ImpTotal: voucherData.impTotal,
-      ImpTotConc: 0,
+      ImpTotConc: 0,	
+      CondicionIVAReceptorId : 5,
       ImpNeto: voucherData.impNeto,
       ImpOpEx: 0,
       ImpIVA: voucherData.impIVA,
@@ -144,9 +146,12 @@ export async function getLastVoucherNumber(
   }
 
   try {
+    console.log("afip");
     const afip = createAfipInstance(credentials);
+    console.log("afip");
     return await afip.ElectronicBilling.getLastVoucher(puntoVenta, tipoFactura);
   } catch (error) {
+    console.log("afip error", error);
     if (error instanceof Error) {
       throw new AFIPApiError(`AFIP API error: ${error.message}`);
     }
@@ -158,19 +163,4 @@ export interface TAData {
   token: string;
   sign: string;
   expirationTime: Date;
-}
-
-export async function getTAFromAccessToken(
-  accessToken: string
-): Promise<TAToken> {
-  return {
-    token: accessToken,
-    sign: "",
-    generationTime: {toDate: () => new Date()} as TAToken["generationTime"],
-    expirationTime: {
-      toDate: () => new Date(Date.now() + 12 * 60 * 60 * 1000),
-    } as TAToken["expirationTime"],
-    source: "afipsdk",
-    destination: "afip",
-  };
 }

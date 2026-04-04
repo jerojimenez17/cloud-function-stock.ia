@@ -7,25 +7,40 @@ import * as logger from "firebase-functions/logger";
  */
 export const createAFIPVoucher = onRequest(async (request, response) => {
   const allowedOrigins = [
-    "https://renata-three.vercel.app",
+    "https://prueba-demo-app.vercel.app",
     "http://localhost:3000",
   ];
   const origin = request.headers.origin;
 
-  console.log(request.body);
   if (origin && allowedOrigins.includes(origin)) {
     response.set("Access-Control-Allow-Origin", origin);
   } else {
     response.set(
       "Access-Control-Allow-Origin",
-      "https://renata-three.vercel.app"
+    "https://prueba-demo-app.vercel.app",
     );
   }
   response.set("Access-Control-Allow-Methods", "POST, OPTIONS");
-  response.set("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  response.set("Access-Control-Allow-Headers", "Content-Type, Authorization, x-internal-key");
 
   if (request.method === "OPTIONS") {
     response.status(204).send("");
+    return;
+  }
+
+  // Authentication check
+  const internalKey = request.headers["x-internal-key"];
+  const expectedKey = process.env.INTERNAL_AFIP_API_KEY;
+
+  if (!internalKey || internalKey !== expectedKey) {
+    logger.warn("Unauthorized request attempt", {
+      ip: request.ip,
+      userAgent: request.headers["user-agent"],
+    });
+    response.status(401).send({
+      error: "No autorizado",
+      details: "Clave interna inválida o ausente",
+    });
     return;
   }
 
