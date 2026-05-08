@@ -1,6 +1,6 @@
 import Afip from "@afipsdk/afip.js";
 import {AFIPApiError} from "./errors.js";
-import { decrypt } from "./encryption.js";
+import {decrypt} from "./encryption.js";
 
 export {AFIPApiError};
 
@@ -17,8 +17,6 @@ interface AfipCredentials {
 }
 
 function createAfipInstance(credentials: AfipCredentials): Afip {
-
-
   if (credentials.encryptedCert && credentials.encryptedKey) {
     const cert = decrypt(credentials.encryptedCert);
     const key = decrypt(credentials.encryptedKey);
@@ -83,8 +81,8 @@ export async function createVoucherWithAfip(
       CbteHasta: voucherData.cbteHasta,
       CbteFch: voucherData.cbteFch,
       ImpTotal: voucherData.impTotal,
-      ImpTotConc: 0,	
-      CondicionIVAReceptorId : 5,
+      ImpTotConc: 0,
+      CondicionIVAReceptorId: 5,
       ImpNeto: voucherData.impNeto,
       ImpOpEx: 0,
       ImpIVA: voucherData.impIVA,

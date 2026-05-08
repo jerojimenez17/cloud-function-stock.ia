@@ -7,11 +7,21 @@ import {
 import {z} from "zod";
 
 
-const CreateVoucherSchema = z.object({
+export const CreateVoucherSchema = z.object({
   action: z.enum(["createVoucher"]).optional(),
   accessToken: z.string().optional(),
   encryptedCert: z.string().optional(),
   encryptedKey: z.string().optional(),
+  arca: z.object({
+    cuit: z.string().nullable().optional(),
+    razonSocial: z.string().nullable().optional(),
+    inicioActividades: z.union([z.string().datetime(), z.string()]).nullable().optional(),
+    condicionIva: z.enum(["RESPONSABLE_INSCRIPTO", "MONOTRIBUTO"]).nullable().optional().default("MONOTRIBUTO"),
+    address: z.string().nullable().optional(),
+    cert: z.string().nullable().optional(),
+    key: z.string().nullable().optional(),
+    puntoVenta: z.number().int().positive().optional(),
+  }).optional(),
   billState: z.object({
     billType: z.string(),
     typeDocument: z.string().default(""),
@@ -46,15 +56,15 @@ export async function createVoucher(data: unknown): Promise<ApiResponse> {
     };
   }
 
-  const {encryptedCert, encryptedKey, billState} = result.data;
-  const access_token="umVjlF97JY359d7B7zVh69zGb8JDs4yX5AYbCJtClRQviupmKIEwWTUWZBrGmq6k";
+  const {encryptedCert, encryptedKey, billState, arca} = result.data;
+  const access_token=process.env.AFIP_ACCESS_TOKEN;
   const credentials = {
     accessToken: access_token,
     encryptedCert,
     encryptedKey,
-    CUIT: "20407713606",
+    CUIT: arca?.cuit || "20407713606",
   };
-  const puntoVenta = 1;
+  const puntoVenta = arca?.puntoVenta || 1;
 
   try {
     let tipoFactura = 11;

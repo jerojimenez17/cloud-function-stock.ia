@@ -6,6 +6,15 @@ export const ProductSchema = z.object({
   amount: z.number().positive(),
 });
 
+export const ArcaTestCertsRequestSchema = z.object({
+  cuit: z.string().min(1, "CUIT is required"),
+  username: z.string().min(1, "Username is required"),
+  password: z.string().min(1, "Password is required"),
+  alias: z.string().min(1, "Alias is required"),
+  accessToken: z.string().optional(),
+});
+
+
 export const BillStateSchema = z.object({
   billType: z.string(),
   typeDocument: z.string().default(""),
@@ -47,6 +56,27 @@ export function validateRequest(data: unknown):
     { success: boolean; data?: FunctionRequest;
       error?: { code: string; message: string } } {
   const result = FunctionRequestSchema.safeParse(data);
+
+  if (!result.success) {
+    return {
+      success: false,
+      error: {
+        code: "VALIDATION_ERROR",
+        message: result.error.errors.map((e) => e.message).join(", "),
+      },
+    };
+  }
+
+  return {
+    success: true,
+    data: result.data,
+  };
+}
+
+export function validateArcaTestCertsRequest(data: unknown):
+    { success: boolean; data?: z.infer<typeof ArcaTestCertsRequestSchema>;
+      error?: { code: string; message: string } } {
+  const result = ArcaTestCertsRequestSchema.safeParse(data);
 
   if (!result.success) {
     return {
