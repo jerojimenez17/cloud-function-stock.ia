@@ -13,7 +13,7 @@ interface AfipCredentials {
   accessToken?: string;
   encryptedCert?: string;
   encryptedKey?: string;
-  CUIT: string;
+  cuit: string;
 }
 
 function createAfipInstance(credentials: AfipCredentials): Afip {
@@ -23,8 +23,8 @@ function createAfipInstance(credentials: AfipCredentials): Afip {
     return new Afip({
       cert,
       key,
-      CUIT: Number(credentials.CUIT),
-      access_token: "umVjlF97JY359d7B7zVh69zGb8JDs4yX5AYbCJtClRQviupmKIEwWTUWZBrGmq6k",
+      CUIT: Number(credentials.cuit),
+      access_token:credentials.accessToken,
     } as any);
   }
 
@@ -103,7 +103,7 @@ export async function createVoucherWithAfip(
     const qrDataObj = {
       ver: 1,
       fecha: voucherData.cbteFch,
-      cuit: Number(credentials.CUIT),
+      cuit: Number(credentials.cuit),
       ptoVta: voucherData.puntoVenta,
       tipoCmp: voucherData.tipoFactura,
       nroCmp: voucherData.cbteDesde,

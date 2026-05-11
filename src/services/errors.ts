@@ -12,9 +12,12 @@ export class AFIPAuthError extends Error {
  * Custom error class for AFIP API errors
  */
 export class AFIPApiError extends Error {
-  constructor(message: string) {
+  public details?: unknown;
+
+  constructor(message: string, details?: unknown) {
     super(message);
     this.name = "AFIPApiError";
+    this.details = details;
   }
 }
 

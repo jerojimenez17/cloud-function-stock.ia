@@ -37,5 +37,6 @@ export interface ApiResponse<T = unknown> {
   error?: {
     code: string;
     message: string;
+    details?: unknown;
   };
 }

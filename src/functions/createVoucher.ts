@@ -62,7 +62,7 @@ export async function createVoucher(data: unknown): Promise<ApiResponse> {
     accessToken: access_token,
     encryptedCert,
     encryptedKey,
-    CUIT: arca?.cuit || "",
+    cuit: arca?.cuit || "",
   };
   const puntoVenta = arca?.puntoVenta || 1;
 
